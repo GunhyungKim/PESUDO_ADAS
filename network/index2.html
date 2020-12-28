@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Marker Clustering</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script>
+	var offset = 0;
+	var map;
+	var markers;
+	var labels = ['dog1','dog2','dog3','cat1','cat2','cat3'];
+	
+  function initMap() {
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 19,
+      center: {lat:35.886906, lng: 128.60928}
+    });
+
+    // Create an array of alphabetical characters used to label the markers.
+    
+
+    // Add some markers to the map.
+    // Note: The code uses the JavaScript Array.prototype.map() method to
+    // create an array of markers based on a given "locations" array.
+    // The map() method here has nothing to do with the Google Maps API.
+    markers = objs.map(function(location, i) {
+      marker =  new google.maps.Marker({
+        position: {lat:location.lat,lng:location.lng},
+        label: objs.name,//labels[i % labels.length],
+  map : map
+      });
+      if(i==0)
+          {
+
+            var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
+            var icon = {
+              path: car,
+              scale: .7,
+              strokeColor: 'white',
+              strokeWeight: .10,
+              fillOpacity: 1,
+              fillColor: '#404040',
+              offset: '5%',
+              // rotation: parseInt(heading[i]),
+              anchor: new google.maps.Point(10, 25), // orig 10,50 back of car, 10,0 front of car, 10,25 center of car
+              rotation:location.azimuth
+            };
+            
+            marker.setIcon(icon);
+            
+          }
+      return marker;
+    });
+
+    // Add a marker clusterer to manage the markers.
+    //var markerCluster = new MarkerClusterer(map, markers,
+    //    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+  }
+	  
+      var objs = [
+        {lat:35.88781041262922, lng: 128.60928, name: 'dog'},
+		{lat:35.88763768518697, lng: 128.60993171619353, name: 'dog'},
+		{lat:35.88718547887236, lng: 128.61033449895214, name: 'dog'},
+		{lat:35.886626521127646, lng: 128.61033449895214, name: 'dog'},
+		{lat:35.88617431481304, lng: 128.60993171619353, name: 'dog'},
+		{lat:35.886001587370785, lng: 128.60928, name: 'dog'},
+		{lat:35.88617431481304, lng: 128.6086282838065, name: 'dog'},
+		{lat:35.886626521127646, lng: 128.60822550104788, name: 'dog'},
+		{lat:35.88718547887236, lng: 128.60822550104788, name: 'dog'},
+		{lat:35.88763768518697, lng: 128.6086282838065, name: 'dog'}
+      ]
+	  
+	  function updateLoc(){
+		  var i;
+		  //update location
+		  for (i=0;i<objs.length;i++){
+		  objs[i] = {lat:objs[i].lat + offset,lng:objs[i].lng+offset, name: objs[i].name}
+		  
+		  }
+		  offset += 0.00001; //increase offset
+		  
+		  //remove all marker
+		  for(i=0;i<markers.length;i++){
+		  markers[i].setMap(null);
+		  }
+		  
+		  markers = objs.map(function(location, i) {
+          marker =  new google.maps.Marker({
+            position: {lat:location.lat,lng:location.lng},
+            label: objs.name,//labels[i % labels.length],
+			map : map
+          });
+
+        return marker;
+        });
+	  }
+	  
+	  function updateLocFromServer(data){
+		var i;
+		var parsed_data = JSON.parse(data);
+		
+		 objs = []
+		  //update location
+		  for (i=0;i<parsed_data.length;i++){
+		  var obj = {lat:parsed_data[i].lat ,lng:parsed_data[i].lng, name: parsed_data[i].name,azimuth:parsed_data[i].azimuth}
+		  objs.push(obj)
+		  }
+		  
+		  
+		  //remove all marker
+		  for(i=0;i<markers.length;i++){
+		  markers[i].setMap(null);
+		  }
+		  
+		  markers = objs.map(function(location, i) {
+          marker = new google.maps.Marker({
+            position: {lat:objs[i].lat,lng:objs[i].lng},
+            label: objs[i].name,//labels[i % labels.length],
+			map : map
+			});  
+
+          if(i==0)
+          {
+
+            var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
+            var icon = {
+              path: car,
+              scale: .7,
+              strokeColor: 'white',
+              strokeWeight: .10,
+              fillOpacity: 1,
+              fillColor: '#404040',
+              offset: '5%',
+              // rotation: parseInt(heading[i]),
+              anchor: new google.maps.Point(10, 25), // orig 10,50 back of car, 10,0 front of car, 10,25 center of car
+              rotation:objs[i].azimuth
+            };
+            
+            marker.setIcon(icon);
+            map.setCenter({lat:location.lat ,lng:location.lng});
+          }
+
+
+        return marker;
+
+        });
+	  }
+	  
+	  //setInterval(updateLoc,1000);
+	  
+	  
+	 
+	  $(document).ready(function(){
+    var socket = new WebSocket('ws://localhost:9000/ws');
+
+	function sendRequest(){
+		socket.send('Hi');
+	}
+	
+    socket.onopen = function(event){
+        sendRequest();
+    }
+	
+	setInterval(sendRequest,1000);
+
+    socket.onmessage = function(event){
+        console.log(event.data);
+		updateLocFromServer(event.data)
+	
+	};
+
+    $(window).unload(function(event){
+        socket.close();
+    });
+});
+	
+	
+	
+    </script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk1svGr_eeqb2aJaXy42u9e8xshST59ek&callback=initMap">
+    </script>
+  </body>
+</html>
