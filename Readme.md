@@ -1,5 +1,10 @@
 C++로 작성한 종프 소스코드
 
+환경
+Nvidia Jetson TX2
+Ubuntu
+Stereo Camera (해당 Project에서는 oCam)
+
 외부라이브러리
 
     소켓관련
