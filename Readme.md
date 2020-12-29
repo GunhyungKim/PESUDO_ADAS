@@ -2,7 +2,7 @@ C++로 작성한 종프 소스코드
 
 환경
    
-   Nvidia Jetson TX2
+    Nvidia Jetson TX2
     
     Ubuntu
     
